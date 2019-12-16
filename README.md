@@ -109,6 +109,9 @@ Produced image:
 
 * Distribution/clojars
 * Stochastic/context-sensitive L-systems
+* Lines could do with smoothing
+* Write tests for `lsystems.turtle`
+* Easy way to run examples
 
 ## References
 
