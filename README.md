@@ -1,5 +1,7 @@
 # lsystems
 
+### [API docs](https://joebentley.github.io/lsystems/)
+
 Simple and easy to use implementation of L-systems in Clojure.
 
 L-systems were invented by Aristid Lindenmayer as a way to model bacteria growth,
