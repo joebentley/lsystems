@@ -31,6 +31,23 @@ Uses the excellent [Clojure2D](https://github.com/Clojure2D/clojure2d) for rende
 
 ## Examples
 
+To list possible examples:
+
+```
+> lein run -m lsystems.examples --list
+examples:
+fractal-binary-tree
+fractal-plant
+```
+
+Then to run an example:
+
+```
+> lein run -m lsystems.examples fractal-binary-tree
+running example fractal-binary-tree...
+(window will display)
+```
+
 See [the examples](./src/lsystems/examples.clj) file. I'll explain one here:
 
 ```clojure
@@ -115,7 +132,7 @@ Produced image:
 * Stochastic/context-sensitive L-systems
 * Lines could do with smoothing
 * Write tests for `lsystems.turtle`
-* Easy way to run examples
+* ~~Easy way to run examples~~
 * Performance profiling
 
 ## Directory structure

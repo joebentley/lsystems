@@ -34,5 +34,21 @@
                          (c/set-stroke canvas 1.3))
       :export-file-name "fractal-plant.jpg")))
 
-;(fractal-binary-tree)
-(fractal-plant)
+(def all-examples [#'fractal-binary-tree #'fractal-plant])
+
+(defn -main
+  "Parse arguments and run the given example"
+  [& args]
+  (let [fn-name (fn [f] (:name (meta f)))]
+    (if (or (empty? args) (some #{"--list"} args))          ;; is argument list empty or contains "--list"?
+      ;; list all the examples
+      (do (println "examples:")
+          (doseq [example all-examples]
+            (println (fn-name example))))
+      ;; get the example
+      (let [chosen-example (last args)
+            index (.indexOf (map (comp str fn-name) all-examples) chosen-example)]
+        (if-not (neg? index)
+          (do (println (str "running example: " chosen-example "..."))
+              ((all-examples index)))
+          (println (str "example " chosen-example " not found")))))))
