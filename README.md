@@ -114,6 +114,13 @@ Produced image:
 * Easy way to run examples
 * Performance profiling
 
+## Directory structure
+
+* `/src` source files
+* `/test` tests
+* `/doc` markdown files for building docs (build docs with `lein codox`)
+* `/docs` codox HTML output directory
+
 ## References
 
 * https://jsantell.com/l-systems
