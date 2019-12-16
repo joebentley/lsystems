@@ -112,6 +112,7 @@ Produced image:
 * Lines could do with smoothing
 * Write tests for `lsystems.turtle`
 * Easy way to run examples
+* Performance profiling
 
 ## References
 
