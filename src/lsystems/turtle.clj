@@ -1,4 +1,19 @@
 (ns lsystems.turtle
+  "Everything to do with drawing the L-system to the screen.
+
+  We use the excellent [Clojure2D](https://github.com/Clojure2D/clojure2d) to do the rendering, and we implement
+  a simple version of [turtle graphics](https://en.wikipedia.org/wiki/Turtle_graphics)–where a pen is
+  controlled by movement commands and lines are drawn out along its movement path.
+
+  The central object is the pen state, produced by `(new-pen-state ...)`, which stores the current pen position
+  and orientation, whether or not the pen is down, a stack for pushing and popping the pen position and orientation,
+  and a list for storing the generated line segments, which are added by the function `(forward [pen-state by-pixels])`
+  if the pen is down.
+
+  The actual rendering is done by the `(draw-lines [canvas line-segments])` function.
+
+  Line segments are of the form of a map `{ :from { :x :y } :to { :x :y } }`."
+  {:doc/format :markdown}
   (:require
     [clojure2d.core :as c]
     ;[clojure2d.color :as col]
@@ -18,13 +33,15 @@
    })
 
 (defn get-pos-and-angle
+  "Get the position and facing angle from the pen state."
   [pen-state]
   (select-keys pen-state [:x :y :facing]))
 
-;; Factor that converts degrees to radians
-(def deg-to-rad (/ m/-PI 180.0))
+;; Factor to convert from degree to radians
+(def ^:private deg-to-rad (/ m/-PI 180.0))
 
 (defn new-line-segment
+  "Create a new line segment."
   [from-x from-y to-x to-y]
   { :from { :x from-x :y from-y } :to { :x to-x :y to-y } })
 
@@ -49,10 +66,12 @@
   (assoc pen-state :facing (+ (pen-state :facing) by-angle)))
 
 (defn pen-up
+  "Forward will no longer draw lines, it will just move the cursor."
   [pen-state]
   (assoc pen-state :pen-is-down? false))
 
 (defn pen-down
+  "Forward will draw lines, as well as moving the cursor."
   [pen-state]
   (assoc pen-state :pen-is-down? true))
 
@@ -83,9 +102,9 @@
       (recur (rest state) rules (state-transformation-fn pen-state)))))
 
 (defn draw-lines
-  "Draw the line segments given by lines onto the canvas."
-  [canvas lines]
-  (doseq [{from :from to :to} lines]
+  "Draw the line segments given by `line-segments` onto the canvas."
+  [canvas line-segments]
+  (doseq [{from :from to :to} line-segments]
     (c/line canvas (from :x) (from :y) (to :x) (to :y))))
 
 (defn make-canvas-and-window [width height window-name]
@@ -110,6 +129,7 @@
                                   :to   {:x (f-x (to :x))   :y (f-y (to :y))}}) line-segments))
 
 (defn- line-segments-to-points
+  "Get all points from the given list of line segments."
   [line-segments]
   (flatten (map (fn [segment] (list (segment :from) (segment :to))) line-segments)))
 
@@ -145,7 +165,19 @@
   drawing or changing the canvas settings.
 
   Use the :auto-resize? key along with :auto-resize-padding to automatically resize the drawn figure to
-  fit on the screen."
+  fit on the screen.
+
+  Description of all keys:
+
+  - `:name` string, name of the window, default: \"L-system\"
+  - `:width` `:height` integer, width and height in pixels of the window, default 600 600
+  - `:initial-x` `:initial-y` integer, initial position of the pen. Does nothing if `auto-resize?` is true. default 300 300
+  - `:facing` float, the initial facing direction of the pen. default 0
+  - `:canvas-function` described above. default `identity` (do nothing)
+  - `:auto-resize?` boolean, whether or not to automatically fit the drawing to the canvas. default `true`
+  - `:auto-resize-padding` integer, number of pixels padding when fitting the drawing to the canvas. default 100
+  - `:export-file-name` string, file name to save the image at, doesn't save if `nil`. default `nil`"
+  {:doc/format :markdown}
   [state rules & {:keys [name width height initial-x initial-y facing canvas-function
                          auto-resize? auto-resize-padding export-file-name]
                   :or   {name "L-system" width 600 height 600 initial-x 300 initial-y 300 facing 0
