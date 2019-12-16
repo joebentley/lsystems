@@ -6,5 +6,5 @@
   :plugins [[lein-codox "0.10.7"]]
   :dependencies [[org.clojure/clojure "1.10.0"] [clojure2d "1.1.0"]]
   :repl-options {:init-ns lsystems.core}
-  :codox {:source-uri "https://github.com/joebentley/lsystems/tree/master/{filepath}#L{line}"
+  :codox {:source-uri "https://github.com/joebentley/lsystems/blob/master/{filepath}#L{line}"
           :output-path "docs" })
