@@ -7,7 +7,6 @@
   :dependencies [[org.clojure/clojure "1.10.0"] [clojure2d "1.1.0"] [environ "1.1.0"]]
   :repl-options {:init-ns lsystems.core}
   ;:main
-  :jvm-opts ["--illegal-access=deny"] ;; suppress reflection warning
   :profiles {:debug {:env {:debug? "true"}}}
   :codox {:source-uri "https://github.com/joebentley/lsystems/blob/master/{filepath}#L{line}"
           ;; /docs is the serve directory used by github pages
