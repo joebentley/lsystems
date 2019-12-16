@@ -2,6 +2,8 @@
 
 ### [API docs](https://joebentley.github.io/lsystems/)
 
+[![Clojars Project](https://img.shields.io/clojars/v/lsystems.svg)](https://clojars.org/lsystems)
+
 Simple and easy to use implementation of L-systems in Clojure.
 
 L-systems were invented by Aristid Lindenmayer as a way to model bacteria growth,
@@ -109,7 +111,7 @@ Produced image:
 
 ## TODO
 
-* Distribution/clojars
+* ~~Distribution/clojars~~
 * Stochastic/context-sensitive L-systems
 * Lines could do with smoothing
 * Write tests for `lsystems.turtle`
