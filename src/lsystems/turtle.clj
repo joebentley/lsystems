@@ -17,7 +17,8 @@
   (:require
     [clojure2d.core :as c]
     ;[clojure2d.color :as col]
-    [fastmath.core :as m]))
+    [fastmath.core :as m]
+    [lsystems.utils :refer [log]]))
 
 (defn new-pen-state
   "Creates a new pen state object. Keeps track of the pens current position, its orientation, whether or not it is
@@ -155,8 +156,12 @@
                  scaled
                  (map-line-segments (fn [x] (+ padding (* x figure-size)))
                                     (fn [y] (+ padding (* y figure-size))) scaled))]
-    ;(prn (apply max (concat (map :x (line-segments-to-points scaled)) (map :y (line-segments-to-points scaled)))))
     scaled))
+
+(defn optimize-line-segments
+  [line-segments]
+  (log "hello")
+  line-segments)
 
 (defn setup-window-and-execute-state
   "Setup a window and canvas and pen-state with given options and execute a given L-system state.
@@ -197,6 +202,6 @@
                                            line-segments)]
 
         ;; draw the calculated line segments
-        (draw-lines canvas line-segments)
+        (draw-lines canvas (optimize-line-segments line-segments))
         ;; save image file
         (if (not (nil? export-file-name)) (c/save canvas export-file-name)))))

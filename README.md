@@ -137,6 +137,7 @@ Produced image:
 * ~~Easy way to run examples~~
 * Performance profiling
 * Fix centering of images when using `(fit-line-segments-to-screen ...)`, currently they are off centre sometimes
+* Program doesn't really close properly at end
 
 ## Directory structure
 
