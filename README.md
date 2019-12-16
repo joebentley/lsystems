@@ -48,6 +48,8 @@ running example fractal-binary-tree...
 (window will display)
 ```
 
+To run all examples pass `--all`.
+
 See [the examples](./src/lsystems/examples.clj) file. I'll explain one here:
 
 ```clojure
