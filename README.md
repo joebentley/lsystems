@@ -124,16 +124,17 @@ is used to draw all the line segments.
 
 Produced image:
 
-![](./fractal-plant.jpg)
+![Fractal plant](./example-renders/fractal-plant.jpg)
 
 ## TODO
 
 * ~~Distribution/clojars~~
 * Stochastic/context-sensitive L-systems
-* Lines could do with smoothing
+* Lines could do with smoothing. They look weird right now, probably because of being drawn as loads of individual lines
 * Write tests for `lsystems.turtle`
 * ~~Easy way to run examples~~
 * Performance profiling
+* Fix centering of images when using `(fit-line-segments-to-screen ...)`, currently they are off centre sometimes
 
 ## Directory structure
 
@@ -147,6 +148,16 @@ Produced image:
 * https://jsantell.com/l-systems
 
 * https://en.wikipedia.org/wiki/L-system
+
+## Other examples
+
+### Dragon curve
+
+![Dragon curve](./example-renders/dragon-curve.jpg)
+
+### Fractal Binary Tree
+
+![Fractal binary tree](./example-renders/fractal-binary-tree.jpg)
 
 ## License
 

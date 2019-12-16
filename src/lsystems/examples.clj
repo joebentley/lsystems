@@ -11,7 +11,8 @@
      1 (fn [s] (forward s 0.4))
      "[" (fn [s] (-> s (push-pos-and-angle) (rotate (- 45))))
      "]" (fn [s] (-> s (pop-pos-and-angle) (rotate (+ 45))))}
-    :name "Fractal Binary Tree"))
+    :name "Fractal Binary Tree" :auto-resize-padding 50
+    :export-file-name "example-renders/fractal-binary-tree.jpg"))
 
 (defn fractal-plant []
   (let [width 600 height 600]
@@ -32,9 +33,25 @@
                          (c/rect canvas 0 0 width height)
                          (c/set-color canvas :forest-green)
                          (c/set-stroke canvas 1.3))
-      :export-file-name "fractal-plant.jpg")))
+      :export-file-name "example-renders/fractal-plant.jpg")))
 
-(def all-examples [#'fractal-binary-tree #'fractal-plant])
+(defn dragon-curve []
+  (setup-window-and-execute-state
+    (nth-step {\X (seq "X+YF+") \Y (seq "-FX-Y")}
+              '(\F\X)
+              10)
+    {\F (fn [s] (forward s 10))
+     \- (fn [s] (rotate s (- 90)))
+     \+ (fn [s] (rotate s (+ 90)))}
+
+    :name "Dragon curve" :height 400 :auto-resize-padding 50
+    :canvas-function (fn [canvas]
+                       (c/set-background canvas :skyblue)
+                       (c/set-color canvas :white)
+                       (c/set-stroke canvas 2))
+    :export-file-name "example-renders/dragon-curve.jpg"))
+
+(def all-examples [#'fractal-binary-tree #'fractal-plant #'dragon-curve])
 
 (defn -main
   "Parse arguments and run the given example"
@@ -45,10 +62,13 @@
       (do (println "examples:")
           (doseq [example all-examples]
             (println (fn-name example))))
-      ;; get the example
-      (let [chosen-example (last args)
-            index (.indexOf (map (comp str fn-name) all-examples) chosen-example)]
-        (if-not (neg? index)
-          (do (println (str "running example: " chosen-example "..."))
-              ((all-examples index)))
-          (println (str "example " chosen-example " not found")))))))
+      (if (some #{"--all"} args)
+        ;; do all of the examples
+        (doseq [example all-examples] (example))
+        ;; get the example
+        (let [chosen-example (last args)
+              index (.indexOf (map (comp str fn-name) all-examples) chosen-example)]
+          (if-not (neg? index)
+            (do (println (str "running example: " chosen-example "..."))
+                ((all-examples index)))
+            (println (str "example " chosen-example " not found"))))))))
