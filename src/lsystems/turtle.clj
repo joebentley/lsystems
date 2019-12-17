@@ -50,7 +50,8 @@
 (defn forward
   "Move the pen forward by `by-pixels` in the direction specified by (pen-state :facing), adding a line segment
   to (pen-state :lines) if the pen is down. Returns the updated pen-state.
-  If the pen is in same orientation (facing direction) as before, we extend the last line segment instead."
+  If the pen is in same orientation (facing direction) as the last time this function was called, we extend the last
+  line segment instead."
   [pen-state by-pixels]
   (let [{old-x :x old-y :y facing :facing lines :lines last-facing :last-facing} pen-state
         new-pos {:x (+ old-x (* (m/sin (* facing deg-to-rad)) by-pixels))
