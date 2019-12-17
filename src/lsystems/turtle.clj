@@ -31,7 +31,7 @@
    :pen-is-down? pen-is-down?                               ;; are we currently drawing?
    :stack '()                                               ;; for pushing and popping position and angle
    :lines '()                                               ;; list of line segments of form { :from { :x :y } :to { :x :y } }
-   :last-facing facing                                      ;; we cache last facing for use in (forward ...)
+   :last-facing nil                                         ;; we cache last facing for use in (forward ...)
    })
 
 (defn get-pos-and-angle
@@ -51,7 +51,8 @@
   "Move the pen forward by `by-pixels` in the direction specified by (pen-state :facing), adding a line segment
   to (pen-state :lines) if the pen is down. Returns the updated pen-state.
   If the pen is in same orientation (facing direction) as the last time this function was called, we extend the last
-  line segment instead."
+  line segment instead.
+  If (pen-state :last-facing) is nil a new line segment is guaranteed to be created."
   [pen-state by-pixels]
   (let [{old-x :x old-y :y facing :facing lines :lines last-facing :last-facing} pen-state
         new-pos {:x (+ old-x (* (m/sin (* facing deg-to-rad)) by-pixels))
@@ -59,7 +60,7 @@
         ;; store the new line segment only if pen is down
         new-lines (if (pen-state :pen-is-down?)
                     ;; check if pen orientation is same as last, if so we extend the line segment
-                    (if (and (not (empty? lines)) (approx-eq facing last-facing))
+                    (if (and (not (nil? last-facing)) (not (empty? lines)) (approx-eq facing last-facing))
                       (conj (pop lines) (assoc (peek lines) :to new-pos))
                       (conj lines (new-line-segment old-x old-y (new-pos :x) (new-pos :y))))
                     lines)]
@@ -73,28 +74,32 @@
   (assoc pen-state :facing (+ (pen-state :facing) by-angle)))
 
 (defn pen-up
-  "Forward will no longer draw lines, it will just move the cursor."
+  "Forward will no longer draw lines, it will just move the cursor. TODO: test"
   [pen-state]
   (assoc pen-state :pen-is-down? false))
 
 (defn pen-down
-  "Forward will draw lines, as well as moving the cursor."
+  "Forward will draw lines, as well as moving the cursor. TODO: test"
   [pen-state]
   (assoc pen-state :pen-is-down? true))
 
 (defn push-pos-and-angle
-  "Push the pens position and facing direction onto the stack."
+  "Push the pens position, facing direction, and last facing direction onto the stack.
+
+  Sets (pen-state :last-facing) to nil, so that subsequently calling (forward ...) will definitely create a new
+  line segment."
   [pen-state]
   (let [{stack :stack} pen-state]
-    (assoc pen-state :stack (conj stack (get-pos-and-angle pen-state)))))
+    (assoc pen-state :stack (conj stack (select-keys pen-state [:x :y :facing :last-facing]))
+                     :last-facing nil)))
 
 (defn pop-pos-and-angle
-  "Pop the pens position and facing direction off the stack and set the current position and facing angle to it."
+  "Pop the pens position, facing direction, and last facing direction off the stack into the pen state's current values."
   [pen-state]
   (let [{stack :stack} pen-state
-        pos-and-angle (peek stack)]
+        pos-facing-lastfacing (peek stack)]
     (merge (assoc pen-state :stack (pop stack))
-           pos-and-angle)))
+           pos-facing-lastfacing)))
 
 (defn execute-state-with-rules
   "Take the L-system state, a rules map from L-system characters to functions that take and return
