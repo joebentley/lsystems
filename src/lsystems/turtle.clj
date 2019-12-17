@@ -60,7 +60,7 @@
         new-lines (if (pen-state :pen-is-down?)
                     ;; check if pen orientation is same as last, if so we extend the line segment
                     (if (and (not (empty? lines)) (approx-eq facing last-facing))
-                      (conj (pop lines) (merge (peek lines) { :to new-pos }))
+                      (conj (pop lines) (assoc (peek lines) :to new-pos))
                       (conj lines (new-line-segment old-x old-y (new-pos :x) (new-pos :y))))
                     lines)]
 
