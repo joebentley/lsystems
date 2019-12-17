@@ -5,4 +5,4 @@
   (if (env :debug?) (println (str (java.util.Date.) ": " message))))
 
 (defn approx-eq [a b]
-  (< (m/abs (- a b)) 1e-6))
+  (< (m/abs (- a b)) 1e-10))
