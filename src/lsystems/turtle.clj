@@ -18,7 +18,7 @@
     [clojure2d.core :as c]
     ;[clojure2d.color :as col]
     [fastmath.core :as m]
-    [lsystems.utils :refer [log]]))
+    [lsystems.utils :refer [log approx-eq]]))
 
 (defn new-pen-state
   "Creates a new pen state object. Keeps track of the pens current position, its orientation, whether or not it is
@@ -31,6 +31,7 @@
    :pen-is-down? pen-is-down?                               ;; are we currently drawing?
    :stack '()                                               ;; for pushing and popping position and angle
    :lines '()                                               ;; list of line segments of form { :from { :x :y } :to { :x :y } }
+   :last-facing facing                                      ;; we cache last facing for use in (forward ...)
    })
 
 (defn get-pos-and-angle
@@ -48,18 +49,22 @@
 
 (defn forward
   "Move the pen forward by `by-pixels` in the direction specified by (pen-state :facing), adding a line segment
-  to (pen-state :lines) if the pen is down. Returns the updated pen-state."
+  to (pen-state :lines) if the pen is down. Returns the updated pen-state.
+  If the pen is in same orientation (facing direction) as before, we extend the last line segment instead."
   [pen-state by-pixels]
-  (let [{old-x :x old-y :y facing :facing lines :lines} pen-state
+  (let [{old-x :x old-y :y facing :facing lines :lines last-facing :last-facing} pen-state
         new-pos {:x (+ old-x (* (m/sin (* facing deg-to-rad)) by-pixels))
                  :y (+ old-y (* (m/cos (+ (* facing deg-to-rad) m/-PI)) by-pixels))} ;; screen-space y is down
         ;; store the new line segment only if pen is down
         new-lines (if (pen-state :pen-is-down?)
-                    (conj lines (new-line-segment old-x old-y (new-pos :x) (new-pos :y)))
+                    ;; check if pen orientation is same as last, if so we extend the line segment
+                    (if (and (not (empty? lines)) (approx-eq facing last-facing))
+                      (conj (pop lines) (merge (peek lines) { :to new-pos }))
+                      (conj lines (new-line-segment old-x old-y (new-pos :x) (new-pos :y))))
                     lines)]
 
     ;; return the updated state
-    (merge pen-state new-pos {:lines new-lines})))
+    (merge pen-state new-pos {:lines new-lines :last-facing facing})))
 
 (defn rotate
   "Rotate the pen's facing direction and return the updated state."
@@ -136,7 +141,9 @@
 
 (defn fit-line-segments-to-screen
   "Resize and move all line segments so that they fit on screen. Can optionally pass :padding keyword
-  to pad figure on every side of screen."
+  to pad figure on every side of screen.
+
+  TODO: can I use transducers to speed this up? I need to profile it first."
   [width height line-segments & {:keys [padding] :or {padding 0}}]
 
   (let [all-points (line-segments-to-points line-segments)
@@ -160,7 +167,8 @@
 
 (defn optimize-line-segments
   [line-segments]
-  (log "hello")
+  (log (count line-segments))
+  ;; We want to combine line segments that have roughly the same gradient?
   line-segments)
 
 (defn setup-window-and-execute-state
@@ -202,6 +210,6 @@
                                            line-segments)]
 
         ;; draw the calculated line segments
-        (draw-lines canvas (optimize-line-segments line-segments))
+        (draw-lines canvas line-segments)
         ;; save image file
         (if (not (nil? export-file-name)) (c/save canvas export-file-name)))))

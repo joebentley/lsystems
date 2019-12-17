@@ -132,7 +132,7 @@ Produced image:
 
 * ~~Distribution/clojars~~
 * Stochastic/context-sensitive L-systems
-* Lines could do with smoothing. They look weird right now, probably because of being drawn as loads of individual lines
+* ~~Lines could do with smoothing. They look weird right now, probably because of being drawn as loads of individual lines~~
 * Write tests for `lsystems.turtle`
 * ~~Easy way to run examples~~
 * Performance profiling
