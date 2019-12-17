@@ -166,12 +166,6 @@
                                     (fn [y] (+ padding (* y figure-size))) scaled))]
     scaled))
 
-(defn optimize-line-segments
-  [line-segments]
-  (log (count line-segments))
-  ;; We want to combine line segments that have roughly the same gradient?
-  line-segments)
-
 (defn setup-window-and-execute-state
   "Setup a window and canvas and pen-state with given options and execute a given L-system state.
 
