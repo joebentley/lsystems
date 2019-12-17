@@ -61,7 +61,7 @@ See [the examples](./src/lsystems/examples.clj) file. I'll explain one here:
 (defn fractal-plant []
   (let [width 600 height 600]
 ;; 1.
-    (setup-window-and-execute-state
+    (render-to-canvas-by-executing-state-with-rules
 ;; 2.
       (nth-step {\X (seq "F+[[X]-X]-F[-FX]+X") \F '(\F \F)}
                 \X
@@ -72,27 +72,28 @@ See [the examples](./src/lsystems/examples.clj) file. I'll explain one here:
        \+ (fn [s] (rotate s (+ 25)))
        \[ (fn [s] (push-pos-and-angle s))
        \] (fn [s] (pop-pos-and-angle s))}
-
 ;; 4.
-      :name "Fractal plant" :facing -25
-      :width width :height height :auto-resize-padding 50
+      (fn [canvas]
+        (show-window canvas "Fractal plant")
+        (save-canvas-to-file canvas "example-renders/fractal-plant.jpg"))
 ;; 5.
+      :facing -25 :width width :height height :auto-resize-padding 50
+;; 6.
       :canvas-function (fn [canvas]
                          (c/gradient-mode canvas 0 0 :white 0 height :light-green)
                          (c/rect canvas 0 0 width height)
                          (c/set-color canvas :forest-green)
-                         (c/set-stroke canvas 1.3))
-;; 6.
-      :export-file-name "fractal-plant.jpg")))
+                         (c/set-stroke canvas 1.3)))))
 
 (fractal-plant)
 ```
 
-1. The call `(setup-window-and-execute-state ...)` takes two mandatory arguments,
- a produced L-system state, and a series of rules for symbols in the state that take
+1. The call `(render-to-canvas-by-executing-state-with-rules ...)` takes three mandatory arguments,
+ a produced L-system state, a series of rules for symbols in the state that take
  the pen state (see [turtle.clj](./src/lsystems/turtle.clj))
- and performs a movement action using it,
- and many keyword options that can alter the appearance of the produced image. 
+ and performs a pen movement action using it (e.g. [(forward ...)](https://joebentley.github.io/lsystems/lsystems.turtle.html#var-forward))
+ and finally a function that takes the resulting canvas and uses it, e.g. to save it to an image file,
+ and optionally many keyword options that can alter the appearance of the produced image. 
 
 2. The function `(nth-step [productions state n])` from [core.clj](./src/lsystems/core.clj)
  takes a set of production rules, in this case `{\X (seq "F+[[X]-X]-F[-FX]+X") \F '(\F \F)}`.
@@ -106,23 +107,29 @@ See [the examples](./src/lsystems/examples.clj) file. I'll explain one here:
  and return an updated pen state. For example `\F` moves the pen forward by 10 pixels,
  and `\[` pushes the current pen position and direction to `(pen-state :stack)`.
 
-4. Some examples of the keyword arguments. `:name` is the window name,
- `:facing` is the initial pen direction, `:width` and `:height` are the image dimensions,
+4. This function uses the resulting canvas created by executing the L-system with the given rules. Here
+ we show the canvas in a window with title "Fractal plant" and also save it as a jpeg.
+
+5. Some examples of the possible keyword arguments. `:facing` is the initial pen direction,
+`:width` and `:height` are the image dimensions,
  auto resizing of the generated line segments to fit the image is performed by default, and
  `:auto-resize-padding` is used to set the padding around the image.
  
-5. A function `:canvas-function` can be passed that takes a
+6. A function `:canvas-function` can be passed that takes a
  [Clojure2D Canvas object](https://clojure2d.github.io/clojure2d/docs/codox/clojure2d.core.html)
- which can be used to do some set up before the lines are drawn. For example here we set a gradient
+ which can be used to do some set up _before_ the lines are drawn. For example here we set a gradient
  from white to light green and draw a rect for the background, then we set the stroke
  colour and width for the lines. 
 
-6. If we pass `:export-file-name` the generated image will be saved at that file.
-
-`setup-window-and-execute-state` uses `(execute-state-with-rules [state rules pen-state])`
+`render-to-canvas-by-executing-state-with-rules` uses `(execute-state-with-rules [state rules pen-state])`
 to execute the rules. The pen-state stores the beginning and end of the line segments
 internally when `(forward [pen-state by-pixels])` is called, then `(draw-lines [canvas lines])`
 is used to draw all the line segments.
+
+The `(forward [pen-state by-pixels])` function actually checks whether the
+pen is in the same direction as the previously call by using a cached value stored on `pen-state`, if it does then the
+previous line segment is extended rather than a new line being drawn. This helps with performance (less lines to draw)
+and also helps with the smoothness of the resulting lines.
 
 Produced image:
 

@@ -114,20 +114,22 @@
   (doseq [{from :from to :to} line-segments]
     (c/line canvas (from :x) (from :y) (to :x) (to :y))))
 
-(defn make-canvas-and-window [width height window-name]
-  "Make canvas and show window, returning both canvas and window (in a map w/ keywords :canvas, :window)."
+(defn make-canvas [width height]
+  "Setup and return a new canvas."
   (if (not (and (integer? width) (integer? height)))
     (throw (IllegalArgumentException. "width and height must be integers")))
-  (if (not (string? window-name)) (throw (IllegalArgumentException. "window-name must be a string")))
 
   ;; set everything as fast as possible
   (set! *warn-on-reflection* true)
   (set! *unchecked-math* :warn-on-boxed)
   (m/use-primitive-operators)
 
-  (let [my-canvas (c/canvas width height :high)]
-    {:canvas my-canvas
-     :window (c/show-window my-canvas window-name)}))
+  (c/canvas width height :high))
+
+(defn show-window [canvas window-name]
+  "Setup window with given canvas."
+  (if (not (string? window-name)) (throw (IllegalArgumentException. "window-name must be a string")))
+  (c/show-window canvas window-name))
 
 (defn- map-line-segments
   "Map over all line segments, applying f-x to the x coord of both :from and :to, and same for y"
@@ -166,33 +168,36 @@
                                     (fn [y] (+ padding (* y figure-size))) scaled))]
     scaled))
 
-(defn setup-window-and-execute-state
-  "Setup a window and canvas and pen-state with given options and execute a given L-system state.
+(defn save-canvas-to-file [canvas filename]
+  "Save given canvas to file."
+  (c/save canvas filename))
+
+(defn render-to-canvas-by-executing-state-with-rules
+  "Setup a window and canvas and pen-state with given options and execute a given L-system state, and function `f`
+  that takes the rendered canvas as an argument.
 
   The :canvas-function key should be a function that takes a canvas object and can be used to do extra
-  drawing or changing the canvas settings.
+  drawing or changing the canvas settings _before_ rendering the lines.
 
   Use the :auto-resize? key along with :auto-resize-padding to automatically resize the drawn figure to
   fit on the screen.
 
   Description of all keys:
 
-  - `:name` string, name of the window, default: \"L-system\"
-  - `:width` `:height` integer, width and height in pixels of the window, default 600 600
+  - `:width` `:height` integer, width and height in pixels of the canvas, default 600 600
   - `:initial-x` `:initial-y` integer, initial position of the pen. Does nothing if `auto-resize?` is true. default 300 300
   - `:facing` float, the initial facing direction of the pen. default 0
   - `:canvas-function` described above. default `identity` (do nothing)
   - `:auto-resize?` boolean, whether or not to automatically fit the drawing to the canvas. default `true`
-  - `:auto-resize-padding` integer, number of pixels padding when fitting the drawing to the canvas. default 100
-  - `:export-file-name` string, file name to save the image at, doesn't save if `nil`. default `nil`"
+  - `:auto-resize-padding` integer, number of pixels padding when fitting the drawing to the canvas. default 100"
   {:doc/format :markdown}
-  [state rules & {:keys [name width height initial-x initial-y facing canvas-function
-                         auto-resize? auto-resize-padding export-file-name]
-                  :or   {name "L-system" width 600 height 600 initial-x 300 initial-y 300 facing 0
-                         canvas-function identity auto-resize? true auto-resize-padding 100
-                         export-file-name nil}}]
+  [state rules f & {:keys [width height initial-x initial-y facing canvas-function
+                           auto-resize? auto-resize-padding]
+                    :or   {width 600 height 600 initial-x 300 initial-y 300 facing 0
+                           canvas-function identity auto-resize? true auto-resize-padding 100}}]
+
     (c/with-canvas
-      [canvas ((make-canvas-and-window width height name) :canvas)]
+      [canvas (make-canvas width height)]
       (c/set-color canvas 0 0 0)                            ;; set stroke to black
       (c/set-background canvas 255 255 255)                 ;; set background to white
       (canvas-function canvas)                              ;; execute the passed functions
@@ -206,5 +211,4 @@
 
         ;; draw the calculated line segments
         (draw-lines canvas line-segments)
-        ;; save image file
-        (if (not (nil? export-file-name)) (c/save canvas export-file-name)))))
+        (f canvas))))
