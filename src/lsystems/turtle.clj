@@ -111,28 +111,20 @@
           state-transformation-fn (get rules current identity)]
       (recur (rest state) rules (state-transformation-fn pen-state)))))
 
-(defn draw-lines
-  "Draw the line segments given by `line-segments` onto the canvas."
-  [canvas line-segments]
-  (doseq [{from :from to :to} line-segments]
-    (c/line canvas (from :x) (from :y) (to :x) (to :y))))
+(defn standard-rule-set
+  "A standard set of rules as used in http://algorithmicbotany.org/papers/abop/abop-ch1.pdf
 
-(defn make-canvas [width height]
-  "Setup and return a new canvas."
-  (if (not (and (integer? width) (integer? height)))
-    (throw (IllegalArgumentException. "width and height must be integers")))
-
-  ;; set everything as fast as possible
-  (set! *warn-on-reflection* true)
-  (set! *unchecked-math* :warn-on-boxed)
-  (m/use-primitive-operators)
-
-  (c/canvas width height :high))
-
-(defn show-window [canvas window-name]
-  "Setup window with given canvas."
-  (if (not (string? window-name)) (throw (IllegalArgumentException. "window-name must be a string")))
-  (c/show-window canvas window-name))
+  F: move forward by `x` units
+  +: rotate clockwise by `delta` degrees
+  -: rotate anti-clockwise by `delta` degrees
+  [: push pos and angle to stack
+  ]: pop pos and angle from stack"
+  [x delta]
+  {\F (fn [s] (forward s x))
+   \- (fn [s] (rotate s (- delta)))
+   \+ (fn [s] (rotate s (+ delta)))
+   \[ (fn [s] (push-pos-and-angle s))
+   \] (fn [s] (pop-pos-and-angle s))})
 
 (defn- map-line-segments
   "Map over all line segments, applying f-x to the x coord of both :from and :to, and same for y"
@@ -170,6 +162,31 @@
                  (map-line-segments (fn [x] (+ padding (* x figure-size)))
                                     (fn [y] (+ padding (* y figure-size))) scaled))]
     scaled))
+
+;; Drawing functions
+
+(defn draw-lines
+  "Draw the line segments given by `line-segments` onto the canvas."
+  [canvas line-segments]
+  (doseq [{from :from to :to} line-segments]
+    (c/line canvas (from :x) (from :y) (to :x) (to :y))))
+
+(defn make-canvas [width height]
+  "Setup and return a new canvas."
+  (if (not (and (integer? width) (integer? height)))
+    (throw (IllegalArgumentException. "width and height must be integers")))
+
+  ;; set everything as fast as possible
+  (set! *warn-on-reflection* true)
+  (set! *unchecked-math* :warn-on-boxed)
+  (m/use-primitive-operators)
+
+  (c/canvas width height :high))
+
+(defn show-window [canvas window-name]
+  "Setup window with given canvas."
+  (if (not (string? window-name)) (throw (IllegalArgumentException. "window-name must be a string")))
+  (c/show-window canvas window-name))
 
 (defn save-canvas-to-file [canvas filename]
   "Save given canvas to file."

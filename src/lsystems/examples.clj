@@ -23,11 +23,7 @@
       (nth-step {\X (seq "F+[[X]-X]-F[-FX]+X") \F '(\F \F)}
                 \X
                 6)
-      {\F (fn [s] (forward s 10))
-       \- (fn [s] (rotate s (- 25)))
-       \+ (fn [s] (rotate s (+ 25)))
-       \[ (fn [s] (push-pos-and-angle s))
-       \] (fn [s] (pop-pos-and-angle s))}
+      (standard-rule-set 10 25)
 
       (fn [canvas]
         (show-window canvas "Fractal plant")
