@@ -247,7 +247,11 @@
   This function also optionally takes a `:canvas-function` key which is the same but happens before any of the figures
   are drawn.
 
+  See [here](https://github.com/joebentley/lsystems/blob/master/src/lsystems/examples.clj#L59) for an example of how to
+  use this function.
+
   TODO: clean this up a bit"
+  {:doc/format :markdown}
   [num-columns num-rows width height f states-and-rules & {:keys [padding canvas-function]
                                                            :or {padding 50 canvas-function identity}}]
 

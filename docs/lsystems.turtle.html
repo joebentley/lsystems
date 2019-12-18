@@ -32,20 +32,12 @@ Sets (pen-state :continue-line-segment?) to false.</pre></div><div class="src-li
   <li><code>:canvas-function</code> described above. default <code>identity</code> (do nothing)</li>
   <li><code>:auto-resize?</code> boolean, whether or not to automatically fit the drawing to the canvas. default <code>true</code></li>
   <li><code>:auto-resize-padding</code> integer, number of pixels padding when fitting the drawing to the canvas. default 100</li>
-</ul></div></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L195">view source</a></div></div><div class="public anchor" id="var-render-to-canvas-grid"><h3>render-to-canvas-grid</h3><div class="usage"><code>(render-to-canvas-grid num-columns num-rows width height f states-and-rules &amp; {:keys [padding canvas-function], :or {padding 50, canvas-function identity}})</code></div><div class="doc"><pre class="plaintext">Take num columns, num rows, canvas width, canvas height, a function that uses the resulting canvas
-and a list of maps with shape { :state :rules }, and lays the figures out in a grid.
-
-In the states-and-rules argument the facing is optional and defaults to zero.
-A `:canvas-function` argument can also
-
-The states-and-rules list can also have a couple of other optional keys to change the behaviour of each figure:
-* `:facing` which sets the initial facing direction in degrees
-* `:canvas-function` which is a function that takes the canvas and allows for changing settings before drawing the lines
-
-This function also optionally takes a `:canvas-function` key which is the same but happens before any of the figures
-are drawn.
-
-TODO: clean this up a bit</pre></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L236">view source</a></div></div><div class="public anchor" id="var-rotate"><h3>rotate</h3><div class="usage"><code>(rotate pen-state by-angle)</code></div><div class="doc"><pre class="plaintext">Rotate the pen's facing direction and return the updated state.
+</ul></div></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L195">view source</a></div></div><div class="public anchor" id="var-render-to-canvas-grid"><h3>render-to-canvas-grid</h3><div class="usage"><code>(render-to-canvas-grid num-columns num-rows width height f states-and-rules &amp; {:keys [padding canvas-function], :or {padding 50, canvas-function identity}})</code></div><div class="doc"><div class="markdown"><p>Take num columns, num rows, canvas width, canvas height, a function that uses the resulting canvas and a list of maps with shape { :state :rules }, and lays the figures out in a grid.</p>
+<p>In the states-and-rules argument the facing is optional and defaults to zero. A <code>:canvas-function</code> argument can also</p>
+<p>The states-and-rules list can also have a couple of other optional keys to change the behaviour of each figure: * <code>:facing</code> which sets the initial facing direction in degrees * <code>:canvas-function</code> which is a function that takes the canvas and allows for changing settings before drawing the lines</p>
+<p>This function also optionally takes a <code>:canvas-function</code> key which is the same but happens before any of the figures are drawn.</p>
+<p>See <a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/examples.clj#L59">here</a> for an example of how to use this function.</p>
+<p>TODO: clean this up a bit</p></div></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L236">view source</a></div></div><div class="public anchor" id="var-rotate"><h3>rotate</h3><div class="usage"><code>(rotate pen-state by-angle)</code></div><div class="doc"><pre class="plaintext">Rotate the pen's facing direction and return the updated state.
 Sets (pen-state :continue-line-segment?) to false.</pre></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L70">view source</a></div></div><div class="public anchor" id="var-save-canvas-to-file"><h3>save-canvas-to-file</h3><div class="usage"><code>(save-canvas-to-file canvas filename)</code></div><div class="doc"><pre class="plaintext"></pre></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L191">view source</a></div></div><div class="public anchor" id="var-show-window"><h3>show-window</h3><div class="usage"><code>(show-window canvas window-name)</code></div><div class="doc"><pre class="plaintext"></pre></div><div class="src-link"><a href="https://github.com/joebentley/lsystems/blob/master/src/lsystems/turtle.clj#L186">view source</a></div></div><div class="public anchor" id="var-standard-rule-set"><h3>standard-rule-set</h3><div class="usage"><code>(standard-rule-set x delta)</code></div><div class="doc"><pre class="plaintext">A standard set of rules as used in <a href="http://algorithmicbotany.org/papers/abop/abop-ch1.pdf">http://algorithmicbotany.org/papers/abop/abop-ch1.pdf</a>
 
 F: move forward by `x` units
