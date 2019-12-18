@@ -60,13 +60,14 @@
   "Example of using render-to-canvas-grid
 
   Source: http://algorithmicbotany.org/papers/abop/abop-ch1.pdf"
-  (let [palette (take-last 6 (col/resample 10 (col/palette-presets :greens-6)))]
+  (let [palette (take-last 6 (col/resample 10 (col/palette-presets :greens-6)))
+        width 2000 height 2000]
     (render-to-canvas-grid
-      3 2 800 800
+      3 2 width height
 
       (fn [canvas]
-        (show-window canvas "abop-fig1.24")
-        (save-canvas-to-file canvas "example-renders/abop-fig1.24.jpg"))
+        ;(show-window canvas "abop-fig1.24")
+        (save-canvas-to-file canvas "example-renders/abop-fig1.24.png"))
 
       (map-indexed
            ;; set color from palette for each figure
@@ -86,10 +87,10 @@
               :rules (standard-rule-set 10 22.5)}))
 
       :canvas-function (fn [canvas]
-                         (c/gradient-mode canvas 0 0 :white 800 800 :light-blue)
-                         (c/rect canvas 0 0 800 800)
-                         (c/set-stroke canvas 1.2))
-      :padding 35)))
+                         (c/gradient-mode canvas 0 0 :white width height :light-blue)
+                         (c/rect canvas 0 0 width height)
+                         (c/set-stroke canvas 3))
+      :padding 50)))
 
 (def all-examples [#'fractal-binary-tree #'fractal-plant #'dragon-curve #'abop-fig1.24])
 
