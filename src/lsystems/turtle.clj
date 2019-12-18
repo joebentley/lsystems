@@ -31,7 +31,7 @@
    :pen-is-down? pen-is-down?                               ;; are we currently drawing?
    :stack '()                                               ;; for pushing and popping position and angle
    :lines '()                                               ;; list of line segments of form { :from { :x :y } :to { :x :y } }
-   :last-facing nil                                         ;; we cache last facing for use in (forward ...)
+   :continue-line-segment? false                            ;; whether or not to continue the current line segment or make a new one
    })
 
 (defn get-pos-and-angle
@@ -50,9 +50,8 @@
 (defn forward
   "Move the pen forward by `by-pixels` in the direction specified by (pen-state :facing), adding a line segment
   to (pen-state :lines) if the pen is down. Returns the updated pen-state.
-  If the pen is in same orientation (facing direction) as the last time this function was called, we extend the last
-  line segment instead.
-  If (pen-state :last-facing) is nil a new line segment is guaranteed to be created."
+  If (pen-state :continue-line-segment?) is true the last line segment will be extended rather than creating a new one.
+  Sets (pen-state :continue-line-segment?) to true."
   [pen-state by-pixels]
   (let [{old-x :x old-y :y facing :facing lines :lines last-facing :last-facing} pen-state
         new-pos {:x (+ old-x (* (m/sin (* facing deg-to-rad)) by-pixels))
@@ -60,18 +59,19 @@
         ;; store the new line segment only if pen is down
         new-lines (if (pen-state :pen-is-down?)
                     ;; check if pen orientation is same as last, if so we extend the line segment
-                    (if (and (not (nil? last-facing)) (not (empty? lines)) (approx-eq facing last-facing))
+                    (if (and (not (empty? lines)) (pen-state :continue-line-segment?))
                       (conj (pop lines) (assoc (peek lines) :to new-pos))
                       (conj lines (new-line-segment old-x old-y (new-pos :x) (new-pos :y))))
                     lines)]
 
     ;; return the updated state
-    (merge pen-state new-pos {:lines new-lines :last-facing facing})))
+    (merge pen-state new-pos {:lines new-lines :continue-line-segment? true})))
 
 (defn rotate
-  "Rotate the pen's facing direction and return the updated state."
+  "Rotate the pen's facing direction and return the updated state.
+  Sets (pen-state :continue-line-segment?) to false."
   [pen-state by-angle]
-  (assoc pen-state :facing (+ (pen-state :facing) by-angle)))
+  (assoc pen-state :facing (+ (pen-state :facing) by-angle) :continue-line-segment? false))
 
 (defn pen-up
   "Forward will no longer draw lines, it will just move the cursor. TODO: test"
@@ -84,22 +84,20 @@
   (assoc pen-state :pen-is-down? true))
 
 (defn push-pos-and-angle
-  "Push the pens position, facing direction, and last facing direction onto the stack.
-
-  Sets (pen-state :last-facing) to nil, so that subsequently calling (forward ...) will definitely create a new
-  line segment."
+  "Push the pens position and facing direction onto the stack.
+  Sets (pen-state :continue-line-segment?) to false."
   [pen-state]
   (let [{stack :stack} pen-state]
-    (assoc pen-state :stack (conj stack (select-keys pen-state [:x :y :facing :last-facing]))
-                     :last-facing nil)))
+    (assoc pen-state :stack (conj stack (select-keys pen-state [:x :y :facing]))
+                     :continue-line-segment? false)))
 
 (defn pop-pos-and-angle
-  "Pop the pens position, facing direction, and last facing direction off the stack into the pen state's current values."
+  "Pop the pens position and facing direction, off the stack into the pen state's current values.
+  Sets (pen-state :continue-line-segment?) to false."
   [pen-state]
   (let [{stack :stack} pen-state
-        pos-facing-lastfacing (peek stack)]
-    (merge (assoc pen-state :stack (pop stack))
-           pos-facing-lastfacing)))
+        pos-and-facing (peek stack)]
+    (merge (assoc pen-state :stack (pop stack) :continue-line-segment? false) pos-and-facing)))
 
 (defn execute-state-with-rules
   "Take the L-system state, a rules map from L-system characters to functions that take and return
