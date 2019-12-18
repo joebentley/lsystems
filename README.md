@@ -137,7 +137,7 @@ Produced image:
 
 ## TODO
 
-* Draw multiple L-systems on one canvas
+* ~~Draw multiple L-systems on one canvas~~
 * ~~Distribution/clojars~~
 * Stochastic/context-sensitive L-systems
 * ~~Lines could do with smoothing. They look weird right now, probably because of being drawn as loads of individual lines~~
@@ -171,6 +171,10 @@ Produced image:
 ### Fractal Binary Tree
 
 ![Fractal binary tree](./example-renders/fractal-binary-tree.jpg)
+
+### Fig 1.24 http://algorithmicbotany.org/papers/abop/abop-ch1.pdf
+
+![Algorithmic Beauty of Plants example](./example-renders/abop-fig1.24.jpg)
 
 ## License
 

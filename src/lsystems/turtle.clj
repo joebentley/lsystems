@@ -232,3 +232,52 @@
         ;; draw the calculated line segments
         (draw-lines canvas line-segments)
         (f canvas))))
+
+(defn render-to-canvas-grid
+  "Take num columns, num rows, canvas width, canvas height, a function that uses the resulting canvas
+  and a list of maps with shape { :state :rules }, and lays the figures out in a grid.
+
+  In the states-and-rules argument the facing is optional and defaults to zero.
+  A `:canvas-function` argument can also
+
+  The states-and-rules list can also have a couple of other optional keys to change the behaviour of each figure:
+  * `:facing` which sets the initial facing direction in degrees
+  * `:canvas-function` which is a function that takes the canvas and allows for changing settings before drawing the lines
+
+  This function also optionally takes a `:canvas-function` key which is the same but happens before any of the figures
+  are drawn.
+
+  TODO: clean this up a bit"
+  [num-columns num-rows width height f states-and-rules & {:keys [padding canvas-function]
+                                                           :or {padding 50 canvas-function identity}}]
+
+  (if (not (= (* num-columns num-rows) (count states-and-rules)))
+    (throw (IllegalArgumentException. "states-and-rules list does not have enough elements")))
+  (let [cell-width (/ width num-columns) cell-height (/ height num-rows)]
+    (c/with-canvas
+      [canvas (make-canvas width height)]
+      (c/set-color canvas 0 0 0)                            ;; set stroke to black
+      (c/set-background canvas 255 255 255)                 ;; set background to white
+      (canvas-function canvas)
+      ;; calculate line segments for each of the passed state-and-rules
+      (doseq [[index state-rules] (map-indexed vector states-and-rules)] ;; doseq with indices
+          (let [current-column (rem index num-columns) current-row (quot index num-columns)
+                state (get state-rules :state)
+                rules (get state-rules :rules)
+                facing (get state-rules :facing 0)
+                current-canvas-function (get state-rules :canvas-function identity)
+                pen-state (new-pen-state 0 0 :facing facing)
+                ;; calculate line segments and fit them into the cell
+                line-segments (fit-line-segments-to-screen cell-width cell-height
+                                                           ((execute-state-with-rules state rules pen-state) :lines)
+                                                           :padding padding)
+                ;; shift line segments into the cell
+                shifted-line-segments (map-line-segments (fn [x] (+ x (* cell-width current-column)))
+                                                         (fn [y] (+ y (* cell-height current-row)))
+                                                         line-segments)]
+            ;; apply this state's canvas function
+            (current-canvas-function canvas)
+            ;; draw the lines
+            (draw-lines canvas shifted-line-segments)))
+      ;; execute the passed function with the canvas
+      (f canvas))))
