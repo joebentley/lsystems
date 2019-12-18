@@ -235,12 +235,10 @@
 
 (defn render-to-canvas-grid
   "Take num columns, num rows, canvas width, canvas height, a function that uses the resulting canvas
-  and a list of maps with shape { :state :rules }, and lays the figures out in a grid.
+  and a list of maps with shape `{ :state :rules }`, and lays the figures out in a grid.
 
-  In the states-and-rules argument the facing is optional and defaults to zero.
-  A `:canvas-function` argument can also
+  Maps in the states-and-rules list can also have a couple of other optional keys to change the behaviour of each figure:
 
-  The states-and-rules list can also have a couple of other optional keys to change the behaviour of each figure:
   * `:facing` which sets the initial facing direction in degrees
   * `:canvas-function` which is a function that takes the canvas and allows for changing settings before drawing the lines
 
