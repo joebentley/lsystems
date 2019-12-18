@@ -80,7 +80,7 @@
               :rules (standard-rule-set 10 22.5)}
              {:state (nth-step {\X (seq "F[+X]F[-X]+X") \F '(\F \F)} \X 7)
               :rules (standard-rule-set 10 20)}
-             {:state (nth-step {\X (seq "F[+X]F[-X]FX") \F '(\F \F)} \X 7)
+             {:state (nth-step {\X (seq "F[+X][-X]FX") \F '(\F \F)} \X 7)
               :rules (standard-rule-set 10 25.7)}
              {:state (nth-step {\X (seq "F-[[X]+X]+F[+FX]-X") \F '(\F \F)} \X 5)
               :rules (standard-rule-set 10 22.5)}))
