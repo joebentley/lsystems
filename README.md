@@ -27,7 +27,7 @@ and set the pen's position and direction to that value"
 
 These commands are used to make branching and repeating tree-like structures.
 
-Uses the excellent [Clojure2D](https://github.com/Clojure2D/clojure2d) for rendering.
+We use the excellent [Clojure2D](https://github.com/Clojure2D/clojure2d) for rendering.
 
 ## Examples
 
@@ -91,21 +91,22 @@ See [the examples](./src/lsystems/examples.clj) file. I'll explain one here:
 1. The call `(render-to-canvas-by-executing-state-with-rules ...)` takes three mandatory arguments,
  a produced L-system state, a series of rules for symbols in the state that take
  the pen state (see [turtle.clj](./src/lsystems/turtle.clj))
- and performs a pen movement action using it (e.g. [(forward ...)](https://joebentley.github.io/lsystems/lsystems.turtle.html#var-forward))
+ and performs a pen movement action using it (e.g. [`(forward ...)`](https://joebentley.github.io/lsystems/lsystems.turtle.html#var-forward))
  and finally a function that takes the resulting canvas and uses it, e.g. to save it to an image file,
  and optionally many keyword options that can alter the appearance of the produced image. 
 
-2. The function `(nth-step [productions state n])` from [core.clj](./src/lsystems/core.clj)
+2. The function `(nth-step [productions state n])` from [`core.clj`](./src/lsystems/core.clj)
  takes a set of production rules, in this case `{\X (seq "F+[[X]-X]-F[-FX]+X") \F '(\F \F)}`.
  Here we have a map that replaces the character `\X` with the list of characters
  `(seq "F+[[X]-X]-F[-FX]+X")` (**note** you must turn it into a sequence of characters,
  rather than just using a string), while `\F` is replaced by the list `'(\F \F)` (which is the
- same as `(seq "FF")`. `state` is the initial state of the L-system, and `n` is the number
+ same as `(seq "FF")`). `state` is the initial state of the L-system, and `n` is the number
  of iterations to calculate, in this case 6 iterations.
  
 3. This is a map from characters in the string to functions that take the current pen state
  and return an updated pen state. For example `\F` moves the pen forward by 10 pixels,
  and `\[` pushes the current pen position and direction to `(pen-state :stack)`.
+ See also: [`(standard-rule-set ...)`](https://joebentley.github.io/lsystems/lsystems.turtle.html#var-standard-rule-set).
 
 4. This function uses the resulting canvas created by executing the L-system with the given rules. Here
  we show the canvas in a window with title "Fractal plant" and also save it as a jpeg.
