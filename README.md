@@ -137,6 +137,7 @@ Produced image:
 
 ## TODO
 
+* Draw multiple L-systems on one canvas
 * ~~Distribution/clojars~~
 * Stochastic/context-sensitive L-systems
 * ~~Lines could do with smoothing. They look weird right now, probably because of being drawn as loads of individual lines~~
@@ -144,7 +145,7 @@ Produced image:
 * ~~Easy way to run examples~~
 * Performance profiling
 * Fix centering of images when using `(fit-line-segments-to-screen ...)`, currently they are off centre sometimes
-* Program doesn't really close properly at end
+* Program takes a long time to close, maybe unavoidable and it's just the JVM
 
 ## Directory structure
 
