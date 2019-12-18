@@ -1,4 +1,4 @@
-(defproject lsystems "0.1.0"
+(defproject lsystems "0.2.0-SNAPSHOT"
   :description "Small and simple L-systems implementation in Clojure"
   :url "https://github.com/joebentley/lsystems"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
