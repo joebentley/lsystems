@@ -159,6 +159,8 @@ Produced image:
 
 * https://en.wikipedia.org/wiki/L-system
 
+* [The Algorithmic Beauty of Plants](http://algorithmicbotany.org/papers/#abop)
+
 ## Other examples
 
 ### Dragon curve
