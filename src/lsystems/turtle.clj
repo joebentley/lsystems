@@ -65,7 +65,7 @@
                     lines)]
 
     ;; return the updated state
-    (merge pen-state new-pos {:lines new-lines :continue-line-segment? true})))
+    (merge pen-state new-pos {:lines new-lines :continue-line-segment? (pen-state :pen-is-down?)})))
 
 (defn rotate
   "Rotate the pen's facing direction and return the updated state.
