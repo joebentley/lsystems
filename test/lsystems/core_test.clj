@@ -34,19 +34,19 @@
 (deftest test-step
   (let [productions (add-production new-productions :a '(:a :b))]
     (testing "Advance the state as expected, and work when given a keyword rather than list"
-      (is (= (step productions :a) '(:a :b))))
+      (is (= (step productions :a) [:a :b])))
     (testing "Step using threading operator"
       (is (= (->> :a
                   (step productions)
                   (step productions))
-             '(:a :b :b)))))
+             [:a :b :b]))))
   ; https://en.wikipedia.org/wiki/L-system#Examples_of_L-systems
   (testing "7th step of Algae"
-    (let [algae-system {:A '(:A :B) :B :A}]
+    (let [algae-system {:A [:A :B] :B :A}]
       (is (= (state-to-string (nth-step algae-system :A 7))
              "ABAABABAABAABABAABABAABAABABAABAAB"))))
   (testing "3rd step of Fractal (binary) tree"              ;; also tests using numbers and strings as variables
-    (let [binary-tree-rules {1 '(1 1) 0 '(1 "[" 0 "]" 0)}]
+    (let [binary-tree-rules {1 [1 1] 0 [1 "[" 0 "]" 0]}]
       (is (= (state-to-string (nth-step binary-tree-rules 0 3))
              "1111[11[1[0]0]1[0]0]11[1[0]0]1[0]0"))))
   (testing "Using rules from strings"

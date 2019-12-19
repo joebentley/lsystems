@@ -33,11 +33,13 @@
   (assoc productions from to))
 
 (defn step
-  "Return next iteration of state using the given productions"
+  "Return next iteration of state using the given productions as a vector"
   [productions state]
-  (if (not (seq? state))
-    (step productions (list state))                         ;; wrap in list if not a collection
-    (flatten (map (fn [v] (get productions v v)) state))))
+  (if (not (vector? state))
+    ;; wrap in vector if not already a vector
+    (step productions (if (seq? state) (vec state)          ;; use vector instead of passed selection for performance
+                                       (vector state)))     ;; otherwise just wrap in one
+    (vec (flatten (map (fn [v] (get productions v v)) state)))))
 
 (defn step-with-productions
   "Bind step function to given productions"
