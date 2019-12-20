@@ -37,10 +37,10 @@
         (is (and (approx-eq (executed :x) -10) (approx-eq (executed :y) -10)))
         (is (= (count (executed :lines)) 2))))
     (testing "Rules are called in order"
-      (with-local-vars [i 0]
-        (let [f (fn [s]
-                  (var-set i (inc (var-get i)))
-                  (assoc s :lines (conj (s :lines) (var-get i))))
-              rules {\F f \+ f}
-              executed (execute-state-with-rules state rules ps)]
-          (is (= (executed :lines) '(3 2 1)))))))) ;; lists push to front
+      (= (execute-state-with-rules
+           (seq "123")
+           {\1 (fn [s] (assoc s :lines (conj (s :lines) 1)))
+            \2 (fn [s] (assoc s :lines (conj (s :lines) 2)))
+            \3 (fn [s] (assoc s :lines (conj (s :lines) 3)))}
+           ps)
+         '(3 2 1))))) ;; lists push to front, not to the back
