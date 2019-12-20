@@ -31,8 +31,8 @@
    :pen-is-down? pen-is-down?                               ;; are we currently drawing?
    :stack '()                                               ;; for pushing and popping position and angle
    :lines '()                                               ;; list of line segments of form { :from { :x :y } :to { :x :y } }
-   :continue-line-segment? false                            ;; whether or not to continue the current line segment or make a new one
-   })
+   :continue-line-segment? false})                          ;; whether or not to continue the current line segment or make a new one
+
 
 (defn get-pos-and-angle
   "Get the position and facing angle from the pen state."
@@ -45,7 +45,7 @@
 (defn new-line-segment
   "Create a new line segment."
   [from-x from-y to-x to-y]
-  { :from { :x from-x :y from-y } :to { :x to-x :y to-y } })
+  { :from { :x from-x :y from-y } :to { :x to-x :y to-y}})
 
 (defn forward
   "Move the pen forward by `by-pixels` in the direction specified by (pen-state :facing), adding a line segment
@@ -104,12 +104,14 @@
   the current pen state, and the initial pen state, and executes each character of the L-system
   state in turn, returning the pen state containing the finished line segments in (pen-state :lines)."
   [state rules pen-state]
-  (if (or (empty? state) (nil? state))
-    pen-state
-    (let [current (first state)
-          ;; if we don't find the current state in the rules, use identity
-          state-transformation-fn (get rules current identity)]
-      (recur (rest state) rules (state-transformation-fn pen-state)))))
+  (if (not (seq? state))
+    (execute-state-with-rules (list state) rules pen-state) ;; wrap in list if not already a sequence
+    (if (or (empty? state) (nil? state))
+      pen-state
+      (let [current (first state)
+            ;; if we don't find the current state in the rules, use identity
+            state-transformation-fn (get rules current identity)]
+        (recur (rest state) rules (state-transformation-fn pen-state))))))
 
 (defn standard-rule-set
   "A standard set of rules as used in http://algorithmicbotany.org/papers/abop/abop-ch1.pdf
@@ -216,22 +218,22 @@
                     :or   {width 600 height 600 initial-x 300 initial-y 300 facing 0
                            canvas-function identity auto-resize? true auto-resize-padding 100}}]
 
-    (c/with-canvas
-      [canvas (make-canvas width height)]
-      (c/set-color canvas 0 0 0)                            ;; set stroke to black
-      (c/set-background canvas 255 255 255)                 ;; set background to white
-      (canvas-function canvas)                              ;; execute the passed functions
-      (let [pen-state (new-pen-state (int initial-x) (int initial-y) :facing facing)
-            ;; execute the state with the given rules to get the line segments that the pen draws out
-            executed-state (execute-state-with-rules state rules pen-state)
-            line-segments (executed-state :lines)
-            line-segments (if auto-resize? (fit-line-segments-to-screen width height
-                                                                        line-segments :padding auto-resize-padding)
-                                           line-segments)]
+  (c/with-canvas
+    [canvas (make-canvas width height)]
+    (c/set-color canvas 0 0 0)                            ;; set stroke to black
+    (c/set-background canvas 255 255 255)                 ;; set background to white
+    (canvas-function canvas)                              ;; execute the passed functions
+    (let [pen-state (new-pen-state (int initial-x) (int initial-y) :facing facing)
+          ;; execute the state with the given rules to get the line segments that the pen draws out
+          executed-state (execute-state-with-rules state rules pen-state)
+          line-segments (executed-state :lines)
+          line-segments (if auto-resize? (fit-line-segments-to-screen width height
+                                                                      line-segments :padding auto-resize-padding)
+                                         line-segments)]
 
-        ;; draw the calculated line segments
-        (draw-lines canvas line-segments)
-        (f canvas))))
+      ;; draw the calculated line segments
+      (draw-lines canvas line-segments)
+      (f canvas))))
 
 (defn render-to-canvas-grid
   "Take num columns, num rows, canvas width, canvas height, a function that uses the resulting canvas
@@ -263,23 +265,23 @@
       (canvas-function canvas)
       ;; calculate line segments for each of the passed state-and-rules
       (doseq [[index state-rules] (map-indexed vector states-and-rules)] ;; doseq with indices
-          (let [current-column (rem index num-columns) current-row (quot index num-columns)
-                state (get state-rules :state)
-                rules (get state-rules :rules)
-                facing (get state-rules :facing 0)
-                current-canvas-function (get state-rules :canvas-function identity)
-                pen-state (new-pen-state 0 0 :facing facing)
-                ;; calculate line segments and fit them into the cell
-                line-segments (fit-line-segments-to-screen cell-width cell-height
-                                                           ((execute-state-with-rules state rules pen-state) :lines)
-                                                           :padding padding)
-                ;; shift line segments into the cell
-                shifted-line-segments (map-line-segments (fn [x] (+ x (* cell-width current-column)))
-                                                         (fn [y] (+ y (* cell-height current-row)))
-                                                         line-segments)]
-            ;; apply this state's canvas function
-            (current-canvas-function canvas)
-            ;; draw the lines
-            (draw-lines canvas shifted-line-segments)))
+        (let [current-column (rem index num-columns) current-row (quot index num-columns)
+              state (get state-rules :state)
+              rules (get state-rules :rules)
+              facing (get state-rules :facing 0)
+              current-canvas-function (get state-rules :canvas-function identity)
+              pen-state (new-pen-state 0 0 :facing facing)
+              ;; calculate line segments and fit them into the cell
+              line-segments (fit-line-segments-to-screen cell-width cell-height
+                                                         ((execute-state-with-rules state rules pen-state) :lines)
+                                                         :padding padding)
+              ;; shift line segments into the cell
+              shifted-line-segments (map-line-segments (fn [x] (+ x (* cell-width current-column)))
+                                                       (fn [y] (+ y (* cell-height current-row)))
+                                                       line-segments)]
+          ;; apply this state's canvas function
+          (current-canvas-function canvas)
+          ;; draw the lines
+          (draw-lines canvas shifted-line-segments)))
       ;; execute the passed function with the canvas
       (f canvas))))

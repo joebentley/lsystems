@@ -43,4 +43,6 @@
             \2 (fn [s] (assoc s :lines (conj (s :lines) 2)))
             \3 (fn [s] (assoc s :lines (conj (s :lines) 3)))}
            ps)
-         '(3 2 1))))) ;; lists push to front, not to the back
+         '(3 2 1))) ;; lists push to front, not to the back
+    (testing "Missing rule uses identity instead"
+      (= (execute-state-with-rules \I {} ps) ps))))
